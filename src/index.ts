@@ -1,4 +1,4 @@
-import fetch, { Response } from "node-fetch";
+import fetch, { Response } from 'node-fetch';
 import * as cheerio from 'cheerio';
 import type { DataNode } from 'domhandler';
 
@@ -23,18 +23,19 @@ export interface FormattedResults {
 
 export default function Scraper(profile: string): Promise<FormattedResults> {
   return fetch('https://linktr.ee/' + profile)
-  .then((response: Response) => response.text())
-  .then((responseHtml: string) => {
-    try {
-      const $ = cheerio.load(responseHtml);
-      const data = (
-        ($('#__NEXT_DATA__')[0] as cheerio.ParentNode
-      ).children[0] as unknown as DataNode).data;
-      return convertRawToFormattedResults(JSON.parse(data));
-    } catch (e) {
-      throw new Error('Unable to parse linktree config data');
-    }
-  });
+    .then((response: Response) => response.text())
+    .then((responseHtml: string) => {
+      try {
+        const $ = cheerio.load(responseHtml);
+        const data = (
+          ($('#__NEXT_DATA__')[0] as cheerio.ParentNode)
+            .children[0] as unknown as DataNode
+        ).data;
+        return convertRawToFormattedResults(JSON.parse(data));
+      } catch (e) {
+        throw new Error('Unable to parse linktree config data');
+      }
+    });
 }
 
 function convertRawToFormattedResults(raw: any): FormattedResults {
@@ -45,15 +46,16 @@ function convertRawToFormattedResults(raw: any): FormattedResults {
     links: raw.props.pageProps.links.map((link: any) => {
       return {
         title: link.title,
-        url: link.url
+        url: link.url,
+        thumbnail: link.thumbnail,
       };
     }),
     socials: raw.props.pageProps.socialLinks.map((social: any) => {
       return {
         type: social.type,
-        url: social.url
+        url: social.url,
       };
     }),
-    raw: raw
+    raw: raw,
   };
 }
